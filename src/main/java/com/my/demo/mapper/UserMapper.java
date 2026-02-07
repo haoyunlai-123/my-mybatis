@@ -11,4 +11,6 @@ public interface UserMapper {
     @Select("select * from t_user where id = #{id} and name = #{name}")
     List<User> selectList(@Param("id") Integer id, @Param("name") String name);
 
+    @Select("select * from t_user where id = #{id}")
+    User selectOne(@Param("id") Integer id);
 }

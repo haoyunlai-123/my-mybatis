@@ -12,9 +12,7 @@ import com.my.mybatis.type.StringTypeHandler;
 import com.my.mybatis.type.TypeHandler;
 import lombok.SneakyThrows;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +73,18 @@ public class MapperProxy implements InvocationHandler {
         }
 
         ps.execute();
+
+        // 拿到mapper的返回值类型
+        // 这段代码用于获取方法的返回类型：
+        // - 如果返回类型是带泛型的（如 List<User>)，就取出其第一个泛型参数作为实际返回类型。
+        // - 如果返回类型不是泛型（如 User），就直接使用该返回类型
+        Class returnType = null;
+        Type genericReturnType = method.getGenericReturnType();
+        if (genericReturnType instanceof ParameterizedType) {
+            returnType =  (Class) ((ParameterizedType) genericReturnType).getActualTypeArguments()[0];
+        } else if (genericReturnType instanceof Class) {
+            returnType = (Class) genericReturnType;
+        }
 
         ResultSet resultSet = ps.getResultSet();
         while (resultSet.next()){
