@@ -17,7 +17,7 @@ public class GenericTokenParser {
 
     private TokenHandler tokenHandler;
 
-    private String parse(String text) {
+    public String parse(String text) {
         if (StrUtil.isBlank(text)) {
             return "";
         }
