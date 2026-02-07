@@ -1,6 +1,7 @@
 package com.my.mybatis.binding;
 
 import cn.hutool.aop.proxy.ProxyFactory;
+import cn.hutool.core.util.ReflectUtil;
 import com.my.demo.entity.User;
 import com.my.demo.mapper.UserMapper;
 import com.my.mybatis.annotation.Param;
@@ -14,6 +15,7 @@ import lombok.SneakyThrows;
 
 import java.lang.reflect.*;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,15 +89,27 @@ public class MapperProxy implements InvocationHandler {
         }
 
         ResultSet resultSet = ps.getResultSet();
+
+        // 拿到sql返回字段名称
+        List<String> columnList = new ArrayList<>();
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        for (int i = 0; i < metaData.getColumnCount(); i++) {
+            columnList.add(metaData.getColumnName(i + 1));
+        }
+
+        List list = new ArrayList();
         while (resultSet.next()){
             System.out.println(resultSet.getString("name") + "---" +  resultSet.getInt("age"));
+            Object instance = returnType.newInstance();
+            // 反射为字段赋值
+            ReflectUtil.setFieldValue(instance, "", null);
         }
 
         connection.close();
         resultSet.close();
         ps.close();
 
-        return null;
+        return list;
     }
 
     @SneakyThrows
