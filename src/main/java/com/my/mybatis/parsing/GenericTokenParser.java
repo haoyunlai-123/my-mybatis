@@ -3,6 +3,8 @@ package com.my.mybatis.parsing;
 import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 
+import java.util.List;
+
 /**
  * 解析sql: select * from t_user where id = #{id} and name = #{name}
  * ==> select * from t_user where id = ? and name = ?
@@ -12,6 +14,8 @@ public class GenericTokenParser {
 
     private String openToken; // 开始标记: #{
     private String closeToken; // 结束标记: }
+
+    private TokenHandler tokenHandler;
 
     private String parse(String text) {
         if (StrUtil.isBlank(text)) {
@@ -29,7 +33,7 @@ public class GenericTokenParser {
                 offset = start + openToken.length();
                 String paramName = new String(textChars, offset, end - offset);
                 System.out.println(paramName);
-                result.append("?");
+                result.append(tokenHandler.handleToken(paramName));
                 offset = end + closeToken.length();
             } else {
                 result.append(textChars, offset, text.length() - offset);
@@ -46,8 +50,11 @@ public class GenericTokenParser {
     }
 
     public static void main(String[] args) {
-        GenericTokenParser genericTokenParser = new GenericTokenParser("#{", "}");
-        String parse = genericTokenParser.parse("select * from t_user where id = #{id} and name = #{name");
+        ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler();
+        GenericTokenParser genericTokenParser = new GenericTokenParser("#{", "}", handler);
+        String parse = genericTokenParser.parse("select * from t_user where id = #{id} and name = #{name}");
+        List<String> parameters = handler.getParameterMappings();
+        System.out.println(parameters);
         System.out.println(parse);
 
     }
