@@ -17,7 +17,9 @@ public class TestJdbc {
         // 建立数据库连接
         Connection connection = DriverManager.getConnection("jdbc:mysql://root:1234@localhost:3306/my-mybatis");
 
-        PreparedStatement ps = connection.prepareStatement("select * from t_user");
+        PreparedStatement ps = connection.prepareStatement("select * from t_user where id = ? and name = ?");
+        ps.setInt(1,1);
+        ps.setString(2, "xyg");
         ps.execute();
 
         ResultSet resultSet = ps.getResultSet();
@@ -28,6 +30,11 @@ public class TestJdbc {
         connection.close();
         resultSet.close();
         ps.close();
+    }
+
+    @Test
+    public void test()  throws Exception {
+
     }
 
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface UserMapper {
 
-    @Select("select * from t_user")
-    List<User> selectList();
+    @Select("select * from t_user where id = #{id} and name = #{name}")
+    List<User> selectList(Integer id, String name);
 
 }
