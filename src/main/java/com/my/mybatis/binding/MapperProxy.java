@@ -1,6 +1,5 @@
 package com.my.mybatis.binding;
 
-import cn.hutool.aop.proxy.ProxyFactory;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONUtil;
 import com.my.demo.entity.User;
