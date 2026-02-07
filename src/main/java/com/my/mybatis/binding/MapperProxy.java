@@ -2,6 +2,7 @@ package com.my.mybatis.binding;
 
 import cn.hutool.aop.proxy.ProxyFactory;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.json.JSONUtil;
 import com.my.demo.entity.User;
 import com.my.demo.mapper.UserMapper;
 import com.my.mybatis.annotation.Param;
@@ -97,12 +98,21 @@ public class MapperProxy implements InvocationHandler {
             columnList.add(metaData.getColumnName(i + 1));
         }
 
+        // 将从数据库中获取的一条条数据赋值给实体对象
         List list = new ArrayList();
         while (resultSet.next()){
             System.out.println(resultSet.getString("name") + "---" +  resultSet.getInt("age"));
             Object instance = returnType.newInstance();
-            // 反射为字段赋值
-            ReflectUtil.setFieldValue(instance, "", null);
+
+            for (String columnName : columnList) {
+                Class<?> type = ReflectUtil.getField(returnType, columnName).getType();
+
+                Object value= typeHandlerMap.get(type).getResult(resultSet, columnName);
+                // 反射为字段赋值
+                ReflectUtil.setFieldValue(instance, columnName, value);
+            }
+
+            list.add(instance);
         }
 
         connection.close();
@@ -125,6 +135,6 @@ public class MapperProxy implements InvocationHandler {
     public static void main(String[] args) {
         UserMapper userMapper = MapperProxyFactory.getProxy(UserMapper.class);
         List<User> zq = userMapper.selectList(1, "zq");
-        System.out.println(zq);
+        System.out.println(JSONUtil.toJsonStr(zq));
     }
 }
