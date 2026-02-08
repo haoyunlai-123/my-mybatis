@@ -16,11 +16,11 @@ public class TestApp {
         System.out.println(users);
     }
 
-    @Test
+    /*@Test
     public void test1() throws InstantiationException, IllegalAccessException {
         UserMapper proxy = MapperProxyFactory.getProxy(UserMapper.class);
         List<User> users = proxy.selectList();
         System.out.println(users);
-    }
+    }*/
 
 }

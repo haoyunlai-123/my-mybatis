@@ -6,8 +6,11 @@ import com.my.demo.entity.User;
 import com.my.demo.mapper.UserMapper;
 import com.my.mybatis.annotation.Param;
 import com.my.mybatis.annotation.Select;
+import com.my.mybatis.builder.XMLConfigBuilder;
+import com.my.mybatis.mapping.MappedStatement;
 import com.my.mybatis.parsing.GenericTokenParser;
 import com.my.mybatis.parsing.ParameterMappingTokenHandler;
+import com.my.mybatis.session.Configuration;
 import com.my.mybatis.type.IntegerTypeHandler;
 import com.my.mybatis.type.StringTypeHandler;
 import com.my.mybatis.type.TypeHandler;
@@ -24,15 +27,25 @@ public class MapperProxy implements InvocationHandler {
 
     private Map<Class, TypeHandler> typeHandlerMap = new HashMap<>();
 
-    {
+    private Configuration configuration;
+
+    private Class mapperClass;
+
+    public MapperProxy(Configuration configuration, Class mapperClass) {
+        this.configuration = configuration;
+        this.mapperClass = mapperClass;
         typeHandlerMap.put(Integer.class, new IntegerTypeHandler());
         typeHandlerMap.put(String.class, new StringTypeHandler());
     }
+
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
         Connection connection = getConnection();
+
+        MappedStatement ms = configuration.getMappedStatement(mapperClass.getName() + "." + method.getName());
+//        String sql = ms.getSql();
 
         Select select = method.getAnnotation(Select.class);
         if (select == null) {
@@ -80,13 +93,14 @@ public class MapperProxy implements InvocationHandler {
         // 这段代码用于获取方法的返回类型：
         // - 如果返回类型是带泛型的（如 List<User>)，就取出其第一个泛型参数作为实际返回类型。
         // - 如果返回类型不是泛型（如 User），就直接使用该返回类型
-        Class returnType = null;
+        /*Class returnType = null;
         Type genericReturnType = method.getGenericReturnType();
         if (genericReturnType instanceof ParameterizedType) {
             returnType =  (Class) ((ParameterizedType) genericReturnType).getActualTypeArguments()[0];
         } else if (genericReturnType instanceof Class) {
             returnType = (Class) genericReturnType;
-        }
+        }*/
+        Class returnType = ms.getReturnType();
 
         ResultSet resultSet = ps.getResultSet();
 
@@ -132,7 +146,9 @@ public class MapperProxy implements InvocationHandler {
     }
 
     public static void main(String[] args) {
-        UserMapper userMapper = MapperProxyFactory.getProxy(UserMapper.class);
+        XMLConfigBuilder xmlConfigBuilder = new XMLConfigBuilder();
+        Configuration configuration = xmlConfigBuilder.parse();
+        UserMapper userMapper = MapperProxyFactory.getProxy(UserMapper.class, configuration);
         List<User> zq = userMapper.selectList(1, "zq");
         System.out.println(JSONUtil.toJsonStr(zq));
     }
