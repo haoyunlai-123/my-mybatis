@@ -5,6 +5,8 @@ import com.my.demo.entity.User;
 import com.my.demo.mapper.UserMapper;
 import com.my.mybatis.annotation.Param;
 import com.my.mybatis.builder.XMLConfigBuilder;
+import com.my.mybatis.mapping.MappedStatement;
+import com.my.mybatis.mapping.SqlCommandType;
 import com.my.mybatis.session.Configuration;
 import com.my.mybatis.session.SqlSessionFactory;
 import com.my.mybatis.session.SqlSessionFactoryBuilder;
@@ -42,7 +44,34 @@ public class MapperProxy implements InvocationHandler {
         }
 
         String statementId = mapperClass.getName() + "." + method.getName();
-        return sqlSession.selectList(statementId, paramValueMap);
+        MappedStatement mp = sqlSession.getConfiguration().getMappedStatement(statementId);
+        SqlCommandType sqlCommandType = mp.getSqlCommandType();
+
+        switch (sqlCommandType) {
+            case INSERT:
+                return sqlSession.insert(statementId, paramValueMap);
+            case UPDATE:
+                return sqlSession.update(statementId, paramValueMap);
+            case DELETE:
+                return sqlSession.delete(statementId, paramValueMap);
+            case SELECT:
+                /*Type returnType = method.getGenericReturnType();
+                if (returnType instanceof ParameterizedType) {
+                    // 返回值是泛型类型
+                    return sqlSession.selectList(statementId, paramValueMap);
+                } else {
+                    // 返回值不是泛型类型
+                    return sqlSession.selectOne(statementId, paramValueMap);
+                }*/
+                Boolean isSelectMany = mp.getIsSelectMany();
+                if (isSelectMany) {
+                    return sqlSession.selectList(statementId, paramValueMap);
+                } else {
+                    return sqlSession.selectOne(statementId, paramValueMap);
+                }
+            default:
+                throw new RuntimeException("Unknown SqlCommandType: " + sqlCommandType);
+        }
 
     }
 

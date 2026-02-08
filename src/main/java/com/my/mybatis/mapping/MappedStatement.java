@@ -22,4 +22,6 @@ public class MappedStatement {
 
     private SqlCommandType sqlCommandType; // SQL类型：SELECT、INSERT、UPDATE、DELETE
 
+    private Boolean isSelectMany; // 是否为查询多条记录的SELECT语句
+
 }

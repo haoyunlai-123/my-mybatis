@@ -57,4 +57,9 @@ public class DefaultSqlSession implements SqlSession {
         return MapperProxyFactory.getProxy(mapper, this);
     }
 
+    @Override
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
 }

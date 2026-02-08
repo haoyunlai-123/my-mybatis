@@ -20,4 +20,6 @@ public interface SqlSession {
     int delete(String statement, Object parameter);
 
     <T> T getMapper(Class<T> mapper);
+
+    Configuration getConfiguration();
 }
