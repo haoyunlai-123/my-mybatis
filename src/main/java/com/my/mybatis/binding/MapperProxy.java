@@ -84,6 +84,7 @@ public class MapperProxy implements InvocationHandler {
 
         /*List<User> zq = userMapper.selectList(1, "zq");
         System.out.println(JSONUtil.toJsonStr(zq));*/
-        System.out.println(userMapper.update("暗月骑士", 1, 1));
+//        System.out.println(userMapper.update("暗月骑士", 1, 1));
+        System.out.println(userMapper.update(User.builder().id(1).name("杰克巴尔多").age(2).build()));
     }
 }

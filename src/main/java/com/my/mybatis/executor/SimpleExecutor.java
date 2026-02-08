@@ -139,9 +139,21 @@ public class SimpleExecutor implements Executor {
 
         // 根据映射给sql参数赋值
         Map<String, Object> paramValueMap = (Map<String, Object>) parameter;
+        // paramValueMap: "user" ==> user对象
         for (int i = 0; i < parameterMappings.size(); i++) {
             String jdbcColumnName = parameterMappings.get(i);
             Object val = paramValueMap.get(jdbcColumnName);
+
+            // user.name ==> name
+            // 反射获取user对象的属性值
+            if (jdbcColumnName.contains(".")) {
+                String[] split = jdbcColumnName.split("\\.");
+                String objectName = split[0];
+                String fieldName = split[1];
+                Object objectVal = paramValueMap.get(objectName);
+                val = ReflectUtil.getFieldValue(objectVal, fieldName);
+            }
+
             TypeHandler typeHandler = typeHandlerMap.get(val.getClass());
             if (typeHandler == null) {
                 ps.setObject(i + 1, val);
