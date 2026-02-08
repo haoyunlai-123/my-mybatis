@@ -20,4 +20,6 @@ public class MappedStatement {
 
     private Class returnType; // 返回类型，若为泛型类型，则为泛型参数的类型
 
+    private SqlCommandType sqlCommandType; // SQL类型：SELECT、INSERT、UPDATE、DELETE
+
 }
