@@ -1,29 +1,20 @@
 package com.my.mybatis.binding;
 
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONUtil;
 import com.my.demo.entity.User;
 import com.my.demo.mapper.UserMapper;
 import com.my.mybatis.annotation.Param;
-import com.my.mybatis.annotation.Select;
 import com.my.mybatis.builder.XMLConfigBuilder;
-import com.my.mybatis.executor.Executor;
-import com.my.mybatis.executor.SimpleExecutor;
-import com.my.mybatis.mapping.MappedStatement;
-import com.my.mybatis.parsing.GenericTokenParser;
-import com.my.mybatis.parsing.ParameterMappingTokenHandler;
 import com.my.mybatis.session.Configuration;
-import com.my.mybatis.session.DefaultSqlSession;
+import com.my.mybatis.session.SqlSessionFactory;
+import com.my.mybatis.session.SqlSessionFactoryBuilder;
+import com.my.mybatis.session.defaults.DefaultSqlSession;
 import com.my.mybatis.session.SqlSession;
-import com.my.mybatis.type.IntegerTypeHandler;
-import com.my.mybatis.type.StringTypeHandler;
-import com.my.mybatis.type.TypeHandler;
+import com.my.mybatis.session.defaults.DefaultSqlSessionFactory;
+import com.sun.jndi.cosnaming.CNCtxFactory;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 
 import java.lang.reflect.*;
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,11 +49,9 @@ public class MapperProxy implements InvocationHandler {
 
 
     public static void main(String[] args) {
-        XMLConfigBuilder xmlConfigBuilder = new XMLConfigBuilder();
-        Configuration configuration = xmlConfigBuilder.parse();
-
-        SqlSession sqlsession = new DefaultSqlSession(configuration, configuration.newExecutor());
-        UserMapper userMapper = sqlsession.getMapper(UserMapper.class);
+        SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().builder();
+        SqlSession sqlSession = sessionFactory.openSession();
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
 
         List<User> zq = userMapper.selectList(1, "zq");
         System.out.println(JSONUtil.toJsonStr(zq));

@@ -1,12 +1,12 @@
-package com.my.mybatis.session;
+package com.my.mybatis.session.defaults;
 
 import com.my.mybatis.binding.MapperProxyFactory;
 import com.my.mybatis.executor.Executor;
 import com.my.mybatis.mapping.MappedStatement;
+import com.my.mybatis.session.Configuration;
+import com.my.mybatis.session.SqlSession;
 import lombok.AllArgsConstructor;
 
-import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
