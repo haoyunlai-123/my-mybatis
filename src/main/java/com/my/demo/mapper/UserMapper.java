@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UserMapper {
 
-    @Select("select * from t_user where id = #{id} and name = #{name}")
+    @Select("select * from t_user")
     List<User> selectList(@Param("id") Integer id, @Param("name") String name);
 
     @Select("select * from t_user where id = #{id}")
@@ -17,8 +17,11 @@ public interface UserMapper {
     @Insert("insert into t_user(name, age) values(#{user.name}, #{user.age})")
     Integer insert(@Param("user") User user);
 
-    @Update("update t_user set name = #{user.name}, age = #{user.age} where id = #{user.id}")
-    Integer update(@Param("user") User user);
+    /*@Update("update t_user set name = #{user.name}, age = #{user.age} where id = #{user.id}")
+    Integer update(@Param("user") User user);*/
+
+    @Update("update t_user set name = #{name}, age = #{age} where id = #{id}")
+    Integer update(@Param("name") String name, @Param("age") Integer age, @Param("id") Integer id);
 
     @Delete("delete from t_user where id = #{id}")
     Integer delete(@Param("id") Integer id);

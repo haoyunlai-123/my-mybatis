@@ -82,7 +82,8 @@ public class MapperProxy implements InvocationHandler {
         SqlSession sqlSession = sessionFactory.openSession();
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
 
-        List<User> zq = userMapper.selectList(1, "zq");
-        System.out.println(JSONUtil.toJsonStr(zq));
+        /*List<User> zq = userMapper.selectList(1, "zq");
+        System.out.println(JSONUtil.toJsonStr(zq));*/
+        System.out.println(userMapper.update("暗月骑士", 1, 1));
     }
 }
