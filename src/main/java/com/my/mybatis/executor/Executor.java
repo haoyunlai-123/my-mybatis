@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface Executor {
 
-    <T> List<T> query(MappedStatement ms, Object parameter) throws SQLException;
+    <T> List<T> query(MappedStatement ms, Object parameter);
 
     int update(MappedStatement ms, Object parameter);
 
