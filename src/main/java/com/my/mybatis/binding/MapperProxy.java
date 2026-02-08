@@ -13,9 +13,12 @@ import com.my.mybatis.mapping.MappedStatement;
 import com.my.mybatis.parsing.GenericTokenParser;
 import com.my.mybatis.parsing.ParameterMappingTokenHandler;
 import com.my.mybatis.session.Configuration;
+import com.my.mybatis.session.DefaultSqlSession;
+import com.my.mybatis.session.SqlSession;
 import com.my.mybatis.type.IntegerTypeHandler;
 import com.my.mybatis.type.StringTypeHandler;
 import com.my.mybatis.type.TypeHandler;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.*;
@@ -25,16 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@AllArgsConstructor
 public class MapperProxy implements InvocationHandler {
 
-    private Configuration configuration;
+    private SqlSession sqlSession;
 
     private Class mapperClass;
-
-    public MapperProxy(Configuration configuration, Class mapperClass) {
-        this.configuration = configuration;
-        this.mapperClass = mapperClass;
-    }
 
 
     @Override
@@ -51,9 +50,8 @@ public class MapperProxy implements InvocationHandler {
             paramValueMap.put(paramName, args[i]);
         }
 
-        MappedStatement ms = configuration.getMappedStatement(mapperClass.getName() + "." + method.getName());
-        Executor executor = configuration.newExecutor();
-        return executor.query(ms,  paramValueMap);
+        String statementId = mapperClass.getName() + "." + method.getName();
+        return sqlSession.selectList(statementId, paramValueMap);
 
     }
 
@@ -62,7 +60,10 @@ public class MapperProxy implements InvocationHandler {
     public static void main(String[] args) {
         XMLConfigBuilder xmlConfigBuilder = new XMLConfigBuilder();
         Configuration configuration = xmlConfigBuilder.parse();
-        UserMapper userMapper = MapperProxyFactory.getProxy(UserMapper.class, configuration);
+
+        SqlSession sqlsession = new DefaultSqlSession(configuration, configuration.newExecutor());
+        UserMapper userMapper = sqlsession.getMapper(UserMapper.class);
+
         List<User> zq = userMapper.selectList(1, "zq");
         System.out.println(JSONUtil.toJsonStr(zq));
     }

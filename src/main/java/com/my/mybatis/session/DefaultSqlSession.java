@@ -1,5 +1,6 @@
 package com.my.mybatis.session;
 
+import com.my.mybatis.binding.MapperProxyFactory;
 import com.my.mybatis.executor.Executor;
 import com.my.mybatis.mapping.MappedStatement;
 import lombok.AllArgsConstructor;
@@ -49,6 +50,11 @@ public class DefaultSqlSession implements SqlSession {
     public int delete(String statementId, Object parameter) {
         MappedStatement ms = configuration.getMappedStatement(statementId);
         return executor.update(ms, parameter);
+    }
+
+    @Override
+    public <T> T getMapper(Class<T> mapper) {
+        return MapperProxyFactory.getProxy(mapper, this);
     }
 
 }
