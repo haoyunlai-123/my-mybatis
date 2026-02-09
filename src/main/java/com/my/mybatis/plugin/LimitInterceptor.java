@@ -4,7 +4,11 @@ import com.my.mybatis.executor.Executor;
 import com.my.mybatis.mapping.MappedStatement;
 
 @Intercepts(
-        {@Signature(type = Executor.class, method = "query")}
+        {@Signature(
+                type = Executor.class,
+                method = "query",
+                args = {MappedStatement.class, Object.class}
+        )}
 )
 public class LimitInterceptor implements Interceptor {
 

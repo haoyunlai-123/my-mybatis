@@ -16,4 +16,6 @@ public @interface Signature {
 
     String method(); // 拦截到的Type的方法
 
+    Class<?>[] args(); // 拦截到的Type的方法的参数列表
+
 }
