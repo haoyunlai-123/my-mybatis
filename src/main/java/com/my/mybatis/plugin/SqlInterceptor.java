@@ -9,4 +9,9 @@ public class SqlInterceptor implements Interceptor {
         System.out.println("SqlInterceptor intercept end...");
         return result;
     }
+
+    @Override
+    public <T> T plugin(Object target) {
+        return Plugin.wrap(target, this);
+    }
 }

@@ -19,9 +19,18 @@ public class TestPlugin {
                         new LimitInterceptor()
                     )
                 );*/
-        UserService userService = Plugin.<UserService>wrap(new UserServiceImpl(), new SqlInterceptor());
+
+        /*UserService userService = Plugin.<UserService>wrap(new UserServiceImpl(), new SqlInterceptor());
         UserService userService1 = Plugin.<UserService>wrap(userService, new LimitInterceptor());
-        System.out.println(userService1.selectOne("猴宝"));
+        System.out.println(userService1.selectOne("猴宝"));*/
+
+        LimitInterceptor limitInterceptor = new LimitInterceptor();
+        Object limitPlugin = limitInterceptor.plugin(new UserServiceImpl());
+
+        SqlInterceptor sqlInterceptor = new SqlInterceptor();
+        UserService userService = sqlInterceptor.plugin(limitPlugin);
+
+        System.out.println(userService.selectOne("猴宝"));
     }
 
 }

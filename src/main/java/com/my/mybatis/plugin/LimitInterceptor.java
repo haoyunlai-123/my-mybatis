@@ -9,4 +9,9 @@ public class LimitInterceptor implements Interceptor {
         System.out.println("LimitInterceptor intercept end...");
         return result;
     }
+
+    @Override
+    public <T> T plugin(Object target) {
+        return Plugin.wrap(target, this);
+    }
 }
