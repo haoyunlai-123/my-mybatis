@@ -1,6 +1,7 @@
 package com.my.mybatis.executor;
 
 import cn.hutool.json.JSONUtil;
+import com.my.demo.entity.User;
 import com.my.demo.mapper.UserMapper;
 import com.my.mybatis.plugin.Interceptor;
 import com.my.mybatis.plugin.LimitInterceptor;
@@ -43,7 +44,7 @@ public class TestPlugin {
         SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().builder();
         SqlSession sqlSession = sessionFactory.openSession();
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
-        System.out.println(JSONUtil.toJsonStr(userMapper.selectList()));
+        System.out.println(JSONUtil.toJsonStr(userMapper.insert(User.builder().name("巨剑").age(1000).build())));
     }
 
 }

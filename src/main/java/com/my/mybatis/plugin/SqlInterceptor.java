@@ -1,5 +1,15 @@
 package com.my.mybatis.plugin;
 
+import com.my.mybatis.executor.Executor;
+import com.my.mybatis.mapping.MappedStatement;
+
+@Intercepts(
+        {@Signature(
+                type = Executor.class,
+                method = "query",
+                args = {MappedStatement.class, Object.class}
+        )}
+)
 public class SqlInterceptor implements Interceptor {
 
     @Override
