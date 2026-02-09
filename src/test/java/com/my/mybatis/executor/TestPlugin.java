@@ -44,7 +44,7 @@ public class TestPlugin {
         SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().builder();
         SqlSession sqlSession = sessionFactory.openSession();
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
-        System.out.println(JSONUtil.toJsonStr(userMapper.insert(User.builder().name("巨剑").age(1000).build())));
+        System.out.println(JSONUtil.toJsonStr(userMapper.selectOne(5)));
     }
 
 }
