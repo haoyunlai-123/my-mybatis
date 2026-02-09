@@ -3,6 +3,9 @@ package com.my.mybatis.session;
 import com.my.mybatis.executor.Executor;
 import com.my.mybatis.executor.SimpleExecutor;
 import com.my.mybatis.mapping.MappedStatement;
+import com.my.mybatis.plugin.InterceptorChain;
+import com.my.mybatis.plugin.LimitInterceptor;
+import com.my.mybatis.plugin.SqlInterceptor;
 import com.my.mybatis.type.IntegerTypeHandler;
 import com.my.mybatis.type.StringTypeHandler;
 import com.my.mybatis.type.TypeHandler;
@@ -17,15 +20,20 @@ import java.util.Map;
 @Data
 public class Configuration {
 
-    private Map<Class, TypeHandler> typeHandlerMap = new HashMap<>();
+    private final Map<Class, TypeHandler> typeHandlerMap = new HashMap<>();
+
+    // 插件链
+    private final InterceptorChain interceptorChain = new InterceptorChain();
 
     {
         typeHandlerMap.put(Integer.class, new IntegerTypeHandler());
         typeHandlerMap.put(String.class, new StringTypeHandler());
+        interceptorChain.addInterceptor(new LimitInterceptor());
+        interceptorChain.addInterceptor(new SqlInterceptor());
     }
 
     // key: com.my.demo.mapper.UserMapper.selectOne <===> value: MappedStatement
-    private Map<String, MappedStatement> mappedStatementMap =  new HashMap<>();
+    private final Map<String, MappedStatement> mappedStatementMap =  new HashMap<>();
 
     public void addMappedStatement(MappedStatement ms) {
         mappedStatementMap.put(ms.getId(), ms);
@@ -36,6 +44,6 @@ public class Configuration {
     }
 
     public Executor newExecutor() {
-        return new SimpleExecutor(this);
+        return (Executor) interceptorChain.pluginAll(new SimpleExecutor(this));
     }
 }
