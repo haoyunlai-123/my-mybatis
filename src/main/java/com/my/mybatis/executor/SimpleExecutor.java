@@ -175,6 +175,120 @@ public class SimpleExecutor implements Executor {
     }
 
     @SneakyThrows
+    @Override
+    public int insert(MappedStatement ms, Object parameter) {
+        // insert into t_user(name, age) values(#{name}, #{age})
+        Connection connection = getConnection();
+
+        String originalSql = ms.getSql();
+
+        // sql解析： #{}
+        ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler();
+        GenericTokenParser tokenParser = new GenericTokenParser("#{", "}", handler);
+        String sql = tokenParser.parse(originalSql);
+        List<String> parameterMappings = handler.getParameterMappings();
+
+        PreparedStatement ps = connection.prepareStatement(sql);
+        /*ps.setInt(1, (Integer) args[0]);
+        ps.setString(2, String.valueOf(args[1]));*/
+
+        Map<Class, TypeHandler> typeHandlerMap = configuration.getTypeHandlerMap();
+
+        // 根据映射给sql参数赋值
+        Map<String, Object> paramValueMap = (Map<String, Object>) parameter;
+        // paramValueMap: "user" ==> user对象
+        for (int i = 0; i < parameterMappings.size(); i++) {
+            String jdbcColumnName = parameterMappings.get(i);
+            Object val = paramValueMap.get(jdbcColumnName);
+
+            // user.name ==> name
+            // 反射获取user对象的属性值
+            if (jdbcColumnName.contains(".")) {
+                String[] split = jdbcColumnName.split("\\.");
+                String objectName = split[0];
+                String fieldName = split[1];
+                Object objectVal = paramValueMap.get(objectName);
+                val = ReflectUtil.getFieldValue(objectVal, fieldName);
+            }
+
+            TypeHandler typeHandler = typeHandlerMap.get(val.getClass());
+            if (typeHandler == null) {
+                ps.setObject(i + 1, val);
+            } else {
+                typeHandler.setParameter(ps, i + 1, val);
+            }
+
+        }
+
+        ps.execute();
+
+        // 拿到操作数
+        int insertCount = ps.getUpdateCount();
+
+        connection.close();
+        ps.close();
+
+        return insertCount;
+    }
+
+    @SneakyThrows
+    @Override
+    public int delete(MappedStatement ms, Object parameter) {
+        // delete from t_user where id = #{id}
+        Connection connection = getConnection();
+
+        String originalSql = ms.getSql();
+
+        // sql解析： #{}
+        ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler();
+        GenericTokenParser tokenParser = new GenericTokenParser("#{", "}", handler);
+        String sql = tokenParser.parse(originalSql);
+        List<String> parameterMappings = handler.getParameterMappings();
+
+        PreparedStatement ps = connection.prepareStatement(sql);
+        /*ps.setInt(1, (Integer) args[0]);
+        ps.setString(2, String.valueOf(args[1]));*/
+
+        Map<Class, TypeHandler> typeHandlerMap = configuration.getTypeHandlerMap();
+
+        // 根据映射给sql参数赋值
+        Map<String, Object> paramValueMap = (Map<String, Object>) parameter;
+        // paramValueMap: "user" ==> user对象
+        for (int i = 0; i < parameterMappings.size(); i++) {
+            String jdbcColumnName = parameterMappings.get(i);
+            Object val = paramValueMap.get(jdbcColumnName);
+
+            // user.name ==> name
+            // 反射获取user对象的属性值
+            if (jdbcColumnName.contains(".")) {
+                String[] split = jdbcColumnName.split("\\.");
+                String objectName = split[0];
+                String fieldName = split[1];
+                Object objectVal = paramValueMap.get(objectName);
+                val = ReflectUtil.getFieldValue(objectVal, fieldName);
+            }
+
+            TypeHandler typeHandler = typeHandlerMap.get(val.getClass());
+            if (typeHandler == null) {
+                ps.setObject(i + 1, val);
+            } else {
+                typeHandler.setParameter(ps, i + 1, val);
+            }
+
+        }
+
+        ps.execute();
+
+        // 拿到操作数
+        int deleteCount = ps.getUpdateCount();
+
+        connection.close();
+        ps.close();
+
+        return deleteCount;
+    }
+
+    @SneakyThrows
     private static Connection getConnection() {
         // 加载数据库驱动
         Class.forName("com.mysql.cj.jdbc.Driver");

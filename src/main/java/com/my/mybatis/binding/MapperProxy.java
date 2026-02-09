@@ -44,16 +44,16 @@ public class MapperProxy implements InvocationHandler {
         }
 
         String statementId = mapperClass.getName() + "." + method.getName();
-        MappedStatement mp = sqlSession.getConfiguration().getMappedStatement(statementId);
-        SqlCommandType sqlCommandType = mp.getSqlCommandType();
+        MappedStatement ms = sqlSession.getConfiguration().getMappedStatement(statementId);
+        SqlCommandType sqlCommandType = ms.getSqlCommandType();
 
         switch (sqlCommandType) {
             case INSERT:
-                return sqlSession.insert(statementId, paramValueMap);
+                return convertResult(ms, sqlSession.insert(statementId, paramValueMap));
             case UPDATE:
-                return sqlSession.update(statementId, paramValueMap);
+                return convertResult(ms, sqlSession.update(statementId, paramValueMap));
             case DELETE:
-                return sqlSession.delete(statementId, paramValueMap);
+                return convertResult(ms, sqlSession.delete(statementId, paramValueMap));
             case SELECT:
                 /*Type returnType = method.getGenericReturnType();
                 if (returnType instanceof ParameterizedType) {
@@ -63,7 +63,7 @@ public class MapperProxy implements InvocationHandler {
                     // 返回值不是泛型类型
                     return sqlSession.selectOne(statementId, paramValueMap);
                 }*/
-                Boolean isSelectMany = mp.getIsSelectMany();
+                Boolean isSelectMany = ms.getIsSelectMany();
                 if (isSelectMany) {
                     return sqlSession.selectList(statementId, paramValueMap);
                 } else {
@@ -75,7 +75,18 @@ public class MapperProxy implements InvocationHandler {
 
     }
 
-
+    private Object convertResult(MappedStatement ms, int count) {
+        Class returnType = ms.getReturnType();
+        if (returnType == int.class || returnType == Integer.class) {
+            return count;
+        } else if (returnType == long.class || returnType == Long.class) {
+            return (long) count;
+        } else if (returnType == void.class) {
+            return null;
+        } else {
+            throw new RuntimeException("Unsupported return type for insert method: " + returnType);
+        }
+    }
 
     public static void main(String[] args) {
         SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().builder();
@@ -85,6 +96,8 @@ public class MapperProxy implements InvocationHandler {
         /*List<User> zq = userMapper.selectList(1, "zq");
         System.out.println(JSONUtil.toJsonStr(zq));*/
 //        System.out.println(userMapper.update("暗月骑士", 1, 1));
-        System.out.println(userMapper.update(User.builder().id(1).name("杰克巴尔多").age(2).build()));
+//        System.out.println(userMapper.update(User.builder().id(1).name("杰克巴尔多").age(2).build()));
+
+        System.out.println(userMapper.insert(User.builder().name("和来路").age(60).build()));
     }
 }

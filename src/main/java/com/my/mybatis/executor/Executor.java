@@ -14,4 +14,7 @@ public interface Executor {
 
     int update(MappedStatement ms, Object parameter);
 
+    int insert(MappedStatement ms, Object parameter);
+
+    int delete(MappedStatement ms, Object parameter);
 }

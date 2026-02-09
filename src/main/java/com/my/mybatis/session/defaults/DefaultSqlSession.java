@@ -37,7 +37,7 @@ public class DefaultSqlSession implements SqlSession {
     @Override
     public int insert(String statementId, Object parameter) {
         MappedStatement ms = configuration.getMappedStatement(statementId);
-        return executor.update(ms, parameter);
+        return executor.insert(ms, parameter);
     }
 
     @Override

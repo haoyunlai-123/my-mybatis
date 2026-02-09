@@ -15,7 +15,7 @@ public interface UserMapper {
     User selectOne(@Param("id") Integer id);
 
     @Insert("insert into t_user(name, age) values(#{user.name}, #{user.age})")
-    Integer insert(@Param("user") User user);
+    Long insert(@Param("user") User user);
 
     @Update("update t_user set name = #{user.name}, age = #{user.age} where id = #{user.id}")
     Integer update(@Param("user") User user);

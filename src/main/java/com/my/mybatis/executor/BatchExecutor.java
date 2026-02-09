@@ -18,4 +18,14 @@ public class BatchExecutor implements Executor {
     public int update(MappedStatement ms, Object parameter) {
         return 0;
     }
+
+    @Override
+    public int insert(MappedStatement ms, Object parameter) {
+        return 0;
+    }
+
+    @Override
+    public int delete(MappedStatement ms, Object parameter) {
+        return 0;
+    }
 }
