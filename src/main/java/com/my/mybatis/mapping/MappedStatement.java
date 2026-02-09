@@ -1,9 +1,13 @@
 package com.my.mybatis.mapping;
 
+import com.my.mybatis.parsing.GenericTokenParser;
+import com.my.mybatis.parsing.ParameterMappingTokenHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 /**
  * mapper配置信息
@@ -24,4 +28,12 @@ public class MappedStatement {
 
     private Boolean isSelectMany; // 是否为查询多条记录的SELECT语句
 
+    public BoundSql getBoundSql() {
+        // sql解析： #{}
+        ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler();
+        GenericTokenParser tokenParser = new GenericTokenParser("#{", "}", handler);
+        String sql = tokenParser.parse(this.sql);
+        List<String> parameterMappings = handler.getParameterMappings();
+        return new BoundSql(sql, parameterMappings);
+    }
 }
