@@ -9,33 +9,23 @@ public class Plugin implements InvocationHandler {
 
     private Object target;
 
-    private List<Interceptor> interceptors;
+    private Interceptor interceptor;
 
-    public Plugin(Object target, List<Interceptor> interceptors) {
+    public Plugin(Object target, Interceptor interceptor) {
         this.target = target;
-        this.interceptors = interceptors;
+        this.interceptor = interceptor;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        System.out.println("before method");
-
-        Invocation invocation = new Invocation(target, method, args);
-        for (Interceptor interceptor : interceptors) {
-            interceptor.intercept(invocation);
-        }
-
-//        Object result = method.invoke(target, args);
-
-        System.out.println("after method");
-        return "1";
+        return interceptor.intercept(new Invocation(target, method, args));
     }
 
-    public static <T> T wrap(T target, List<Interceptor> interceptors) {
+    public static <T> T wrap(T target, Interceptor interceptor) {
         return (T) Proxy.newProxyInstance(
           target.getClass().getClassLoader(),
           target.getClass().getInterfaces(),
-          new Plugin(target, interceptors)
+          new Plugin(target, interceptor)
         );
     }
 }

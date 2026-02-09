@@ -12,14 +12,16 @@ public class TestPlugin {
 
     @Test
     public void test1() {
-        UserService userService = Plugin.<UserService>wrap(
+       /* UserService userService = Plugin.<UserService>wrap(
                 new UserServiceImpl(),
                 Arrays.<Interceptor>asList(
                         new SqlInterceptor(),
                         new LimitInterceptor()
                     )
-                );
-        System.out.println(userService.selectOne("猴宝"));
+                );*/
+        UserService userService = Plugin.<UserService>wrap(new UserServiceImpl(), new SqlInterceptor());
+        UserService userService1 = Plugin.<UserService>wrap(userService, new LimitInterceptor());
+        System.out.println(userService1.selectOne("猴宝"));
     }
 
 }
