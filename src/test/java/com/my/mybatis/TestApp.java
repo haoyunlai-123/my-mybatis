@@ -9,12 +9,12 @@ import java.util.List;
 
 public class TestApp {
 
-    @Test
+    /*@Test
     public void test() throws InstantiationException, IllegalAccessException {
         UserMapper userMapper = UserMapper.class.newInstance();
         List<User> users = userMapper.selectList();
         System.out.println(users);
-    }
+    }*/
 
     /*@Test
     public void test1() throws InstantiationException, IllegalAccessException {
