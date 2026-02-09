@@ -10,6 +10,7 @@ import com.my.mybatis.parsing.ParameterMappingTokenHandler;
 import com.my.mybatis.session.Configuration;
 import com.my.mybatis.type.TypeHandler;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Parameter;
 import java.sql.*;
@@ -18,6 +19,7 @@ import java.util.*;
 /**
  * 简单执行器
  */
+@Slf4j
 public class SimpleExecutor implements Executor {
 
     private Configuration configuration;
@@ -179,6 +181,8 @@ public class SimpleExecutor implements Executor {
         // 给sql参数赋值
         setParam(ps, boundSql.getParameterMappings(), parameter);
 
+        log.info("执行SQL: " + boundSql.getSql());
+        log.info("参数: " + parameter);
         ps.execute();
 
         return ps;

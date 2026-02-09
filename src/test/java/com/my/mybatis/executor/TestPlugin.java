@@ -43,7 +43,7 @@ public class TestPlugin {
         SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().builder();
         SqlSession sqlSession = sessionFactory.openSession();
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
-        System.out.println(JSONUtil.toJsonStr(userMapper.selectOne(5)));
+        System.out.println(JSONUtil.toJsonStr(userMapper.selectList()));
     }
 
 }

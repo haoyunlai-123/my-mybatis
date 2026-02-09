@@ -9,7 +9,7 @@ import java.util.List;
 public interface UserMapper {
 
     @Select("select * from t_user")
-    List<User> selectList(@Param("id") Integer id, @Param("name") String name);
+    List<User> selectList();
 
     @Select("select * from t_user where id = #{id}")
     User selectOne(@Param("id") Integer id);
