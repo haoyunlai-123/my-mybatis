@@ -48,7 +48,7 @@ public class SimpleExecutor implements Executor {
             returnType = (Class) genericReturnType;
         }*/
 
-        List<T> list = handleResultSets(ms, ps);
+        List<T> list = configuration.newResultSetHandler().handleResultSets(ms, ps);
 
         connection.close();
 
@@ -105,41 +105,6 @@ public class SimpleExecutor implements Executor {
         return deleteCount;
     }
 
-
-    @SneakyThrows
-    private <T> List<T> handleResultSets(MappedStatement ms, PreparedStatement ps) {
-        Class returnType = ms.getReturnType();
-
-        ResultSet resultSet = ps.getResultSet();
-
-        // 拿到sql返回字段名称
-        List<String> columnList = new ArrayList<>();
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        for (int i = 0; i < metaData.getColumnCount(); i++) {
-            columnList.add(metaData.getColumnName(i + 1));
-        }
-
-        Map<Class, TypeHandler> typeHandlerMap = configuration.getTypeHandlerMap();
-        // 将从数据库中获取的一条条数据赋值给实体对象
-        List list = new ArrayList();
-        while (resultSet.next()){
-            System.out.println(resultSet.getString("name") + "---" +  resultSet.getInt("age"));
-            Object instance = returnType.newInstance();
-
-            for (String columnName : columnList) {
-                Class<?> type = ReflectUtil.getField(returnType, columnName).getType();
-
-                Object value= typeHandlerMap.get(type).getResult(resultSet, columnName);
-                // 反射为字段赋值
-                ReflectUtil.setFieldValue(instance, columnName, value);
-            }
-
-            list.add(instance);
-        }
-        resultSet.close();
-        ps.close();
-        return list;
-    }
 
     @SneakyThrows
     private void setParam(PreparedStatement ps, List<String> parameterMappings, Object parameter) {

@@ -2,6 +2,8 @@ package com.my.mybatis.session;
 
 import com.my.mybatis.executor.Executor;
 import com.my.mybatis.executor.SimpleExecutor;
+import com.my.mybatis.executor.resultset.DefaultResultSetHandler;
+import com.my.mybatis.executor.resultset.ResultSetHandler;
 import com.my.mybatis.mapping.MappedStatement;
 import com.my.mybatis.plugin.InterceptorChain;
 import com.my.mybatis.plugin.LimitInterceptor;
@@ -45,5 +47,9 @@ public class Configuration {
 
     public Executor newExecutor() {
         return (Executor) interceptorChain.pluginAll(new SimpleExecutor(this));
+    }
+
+    public ResultSetHandler newResultSetHandler() {
+        return (ResultSetHandler) interceptorChain.pluginAll(new DefaultResultSetHandler(this));
     }
 }
