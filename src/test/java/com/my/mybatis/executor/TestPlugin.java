@@ -6,7 +6,7 @@ import com.my.demo.mapper.UserMapper;
 import com.my.mybatis.plugin.Interceptor;
 import com.my.mybatis.plugin.LimitInterceptor;
 import com.my.mybatis.plugin.Plugin;
-import com.my.mybatis.plugin.SqlInterceptor;
+import com.my.mybatis.plugin.SqlLogInterceptor;
 import com.my.mybatis.session.SqlSession;
 import com.my.mybatis.session.SqlSessionFactory;
 import com.my.mybatis.session.SqlSessionFactoryBuilder;
@@ -33,7 +33,7 @@ public class TestPlugin {
         LimitInterceptor limitInterceptor = new LimitInterceptor();
         Object limitPlugin = limitInterceptor.plugin(new UserServiceImpl());
 
-        SqlInterceptor sqlInterceptor = new SqlInterceptor();
+        SqlLogInterceptor sqlInterceptor = new SqlLogInterceptor();
         UserService userService = sqlInterceptor.plugin(limitPlugin);
 
         System.out.println(userService.selectOne("猴宝"));

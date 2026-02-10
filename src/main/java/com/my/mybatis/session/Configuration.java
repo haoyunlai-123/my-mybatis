@@ -11,7 +11,7 @@ import com.my.mybatis.executor.statement.StatementHandler;
 import com.my.mybatis.mapping.MappedStatement;
 import com.my.mybatis.plugin.InterceptorChain;
 import com.my.mybatis.plugin.LimitInterceptor;
-import com.my.mybatis.plugin.SqlInterceptor;
+import com.my.mybatis.plugin.SqlLogInterceptor;
 import com.my.mybatis.type.IntegerTypeHandler;
 import com.my.mybatis.type.StringTypeHandler;
 import com.my.mybatis.type.TypeHandler;
@@ -35,7 +35,7 @@ public class Configuration {
         typeHandlerMap.put(Integer.class, new IntegerTypeHandler());
         typeHandlerMap.put(String.class, new StringTypeHandler());
         interceptorChain.addInterceptor(new LimitInterceptor());
-        interceptorChain.addInterceptor(new SqlInterceptor());
+        interceptorChain.addInterceptor(new SqlLogInterceptor());
     }
 
     // key: com.my.demo.mapper.UserMapper.selectOne <===> value: MappedStatement
