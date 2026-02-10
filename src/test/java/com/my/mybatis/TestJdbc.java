@@ -21,7 +21,8 @@ public class TestJdbc {
         System.out.println("是否自动提交: " + connection.getAutoCommit());
 
         connection.setAutoCommit(false);
-
+        // 设置事务隔离级别
+        connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 
         Long sqlStart = System.currentTimeMillis();
         PreparedStatement ps = connection.prepareStatement("insert into `t_user` (id, name) values (10, `铁手`)");

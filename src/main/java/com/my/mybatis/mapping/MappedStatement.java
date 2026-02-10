@@ -36,4 +36,8 @@ public class MappedStatement {
         List<String> parameterMappings = handler.getParameterMappings();
         return new BoundSql(sql, parameterMappings);
     }
+
+    public String getCacheKey(Object parameter) {
+        return id + ":" + sql + ":" + parameter;
+    }
 }

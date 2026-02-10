@@ -3,6 +3,8 @@ package com.my.mybatis.executor;
 import cn.hutool.core.util.ReflectUtil;
 import com.my.mybatis.annotation.Param;
 import com.my.mybatis.annotation.Select;
+import com.my.mybatis.cache.Cache;
+import com.my.mybatis.cache.PerpetualCache;
 import com.my.mybatis.executor.statement.StatementHandler;
 import com.my.mybatis.mapping.BoundSql;
 import com.my.mybatis.mapping.MappedStatement;
@@ -28,6 +30,8 @@ public class SimpleExecutor implements Executor {
     private Configuration configuration;
 
     private Transaction transaction;
+
+    private Cache localCache = new PerpetualCache("LocalCache");
 
     public SimpleExecutor(Configuration configuration, Transaction transaction) {
         this.configuration = configuration;
@@ -57,15 +61,23 @@ public class SimpleExecutor implements Executor {
 
         connection.close();*/
 
+        String cacheKey = ms.getCacheKey(parameter);
+        Object list = localCache.getObject(cacheKey);
+        if (list != null) {
+            return (List<T>) list;
+        }
+
         StatementHandler statementHandler = configuration.newStatementHandler(ms, parameter);
         Statement statement = prepareStatement(statementHandler);
-        return statementHandler.query(statement);
-
+        list = statementHandler.query(statement);
+        localCache.putObject(cacheKey, list);
+        return (List<T>) list;
     }
 
     @SneakyThrows
     @Override
     public int update(MappedStatement ms, Object parameter) {
+        localCache.clear();
         StatementHandler statementHandler = configuration.newStatementHandler(ms, parameter);
         Statement statement = prepareStatement(statementHandler);
         return statementHandler.update(statement);
