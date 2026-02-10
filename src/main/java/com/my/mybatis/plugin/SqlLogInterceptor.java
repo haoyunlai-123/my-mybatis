@@ -18,7 +18,15 @@ import java.sql.Statement;
                 type = StatementHandler.class,
                 method = "update",
                 args = {Statement.class}
-        ),}
+        ),@Signature(
+                type = StatementHandler.class,
+                method = "insert",
+                args = {Statement.class}
+        ),@Signature(
+                type = StatementHandler.class,
+                method = "delete",
+                args = {Statement.class}
+        )}
 )
 @Slf4j
 public class SqlLogInterceptor implements Interceptor {

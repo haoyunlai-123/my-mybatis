@@ -14,13 +14,20 @@ public class TestJdbc {
         // 加载数据库驱动
         Class.forName("com.mysql.cj.jdbc.Driver");
 
+        Long start = System.currentTimeMillis();
         // 建立数据库连接
         Connection connection = DriverManager.getConnection("jdbc:mysql://root:1234@localhost:3306/my-mybatis");
+
+        System.out.println("连接数据库耗时: " + (System.currentTimeMillis() - start) + "ms");
+
+        Long sqlStart = System.currentTimeMillis();
 
         PreparedStatement ps = connection.prepareStatement("select * from t_user where id = ? and name = ?");
         ps.setInt(1,1);
         ps.setString(2, "xyg");
         ps.execute();
+
+        System.out.println("执行SQL耗时: " + (System.currentTimeMillis() - sqlStart) + "ms");
 
         ResultSet resultSet = ps.getResultSet();
         while (resultSet.next()){
