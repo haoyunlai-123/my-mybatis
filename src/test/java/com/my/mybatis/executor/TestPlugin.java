@@ -45,7 +45,7 @@ public class TestPlugin {
         SqlSession sqlSession = sessionFactory.openSession(false);
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
 
-        // 事物级别为重复读， 所有第三次查询时，之前的两次查询结果都不会受update的影响
+        // 事物级别为重复读， 所以第三次查询时，之前的两次查询结果都不会受update的影响
 //        System.out.println(JSONUtil.toJsonStr(userMapper.selectOne(5)));
         System.out.println(JSONUtil.toJsonStr(userMapper.update(User.builder().id(5).name("格里姆格的笨小子").age(18).build())));
 //        System.out.println(JSONUtil.toJsonStr(userMapper.selectOne(5)));

@@ -1,10 +1,8 @@
 package com.my.mybatis.builder;
 
 import cn.hutool.core.util.ClassUtil;
-import com.my.mybatis.annotation.Delete;
-import com.my.mybatis.annotation.Insert;
-import com.my.mybatis.annotation.Select;
-import com.my.mybatis.annotation.Update;
+import com.my.mybatis.annotation.*;
+import com.my.mybatis.cache.PerpetualCache;
 import com.my.mybatis.mapping.MappedStatement;
 import com.my.mybatis.mapping.SqlCommandType;
 import com.my.mybatis.session.Configuration;
@@ -41,6 +39,8 @@ public class XMLConfigBuilder {
 
         Set<Class<?>> classes = ClassUtil.scanPackage("com.my.demo.mapper");
         for (Class<?> aClass : classes) {
+            CacheNamespace cacheNamespace = aClass.getAnnotation(CacheNamespace.class);
+            boolean isCache = cacheNamespace != null;
             Method[] methods = aClass.getMethods();
             for (Method method : methods) {
                 String originalSql = null;
@@ -80,6 +80,7 @@ public class XMLConfigBuilder {
                         .returnType(returnType)
                         .sqlCommandType(sqlCommandType)
                         .isSelectMany(isSelectMany)
+                        .cache(isCache ? new PerpetualCache(aClass.getName()) : null)
                         .build();
                 configuration.addMappedStatement(mappedStatement);
             }

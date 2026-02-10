@@ -1,5 +1,6 @@
 package com.my.mybatis.mapping;
 
+import com.my.mybatis.cache.Cache;
 import com.my.mybatis.parsing.GenericTokenParser;
 import com.my.mybatis.parsing.ParameterMappingTokenHandler;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,8 @@ public class MappedStatement {
     private SqlCommandType sqlCommandType; // SQL类型：SELECT、INSERT、UPDATE、DELETE
 
     private Boolean isSelectMany; // 是否为查询多条记录的SELECT语句
+
+    private Cache cache; // 二级缓存
 
     public BoundSql getBoundSql() {
         // sql解析： #{}

@@ -6,6 +6,7 @@ import com.my.demo.entity.User;
 
 import java.util.List;
 
+@CacheNamespace
 public interface UserMapper {
 
     @Select("select * from t_user")

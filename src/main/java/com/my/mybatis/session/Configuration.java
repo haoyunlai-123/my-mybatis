@@ -1,5 +1,6 @@
 package com.my.mybatis.session;
 
+import com.my.mybatis.executor.CacheExecutor;
 import com.my.mybatis.executor.Executor;
 import com.my.mybatis.executor.SimpleExecutor;
 import com.my.mybatis.datasource.PooledDataSource;
@@ -37,6 +38,8 @@ public class Configuration {
     // 连接池
     private final DataSource dataSource = new PooledDataSource();
 
+    private boolean cacheEnabled = true;
+
     {
         typeHandlerMap.put(Integer.class, new IntegerTypeHandler());
         typeHandlerMap.put(String.class, new StringTypeHandler());
@@ -56,7 +59,11 @@ public class Configuration {
     }
 
     public Executor newExecutor(Transaction transaction) {
-        return (Executor) interceptorChain.pluginAll(new SimpleExecutor(this, transaction));
+        Executor executor = new SimpleExecutor(this, transaction);
+        if (cacheEnabled) {
+            executor = new CacheExecutor(executor);
+        }
+        return (Executor) interceptorChain.pluginAll(executor);
     }
 
     public ResultSetHandler newResultSetHandler() {
