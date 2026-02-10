@@ -17,25 +17,27 @@ public class TestJdbc {
         Long start = System.currentTimeMillis();
         // 建立数据库连接
         Connection connection = DriverManager.getConnection("jdbc:mysql://root:1234@localhost:3306/my-mybatis");
-
         System.out.println("连接数据库耗时: " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println("是否自动提交: " + connection.getAutoCommit());
+
+        connection.setAutoCommit(false);
+
 
         Long sqlStart = System.currentTimeMillis();
-
-        PreparedStatement ps = connection.prepareStatement("select * from t_user where id = ? and name = ?");
-        ps.setInt(1,1);
-        ps.setString(2, "xyg");
+        PreparedStatement ps = connection.prepareStatement("insert into `t_user` (id, name) values (10, `铁手`)");
         ps.execute();
-
         System.out.println("执行SQL耗时: " + (System.currentTimeMillis() - sqlStart) + "ms");
+        System.out.println(ps.getUpdateCount());
 
-        ResultSet resultSet = ps.getResultSet();
-        while (resultSet.next()){
-            System.out.println(resultSet.getString("name") + "---" +  resultSet.getInt("age"));
+        try {
+            connection.commit();
+            int i = 1 / 0;
+        } catch (Exception e) {
+            connection.rollback();
+            throw new RuntimeException(e);
         }
 
         connection.close();
-        resultSet.close();
         ps.close();
     }
 
