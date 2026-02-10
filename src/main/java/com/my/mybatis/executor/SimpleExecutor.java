@@ -9,6 +9,7 @@ import com.my.mybatis.mapping.MappedStatement;
 import com.my.mybatis.parsing.GenericTokenParser;
 import com.my.mybatis.parsing.ParameterMappingTokenHandler;
 import com.my.mybatis.session.Configuration;
+import com.my.mybatis.transaction.Transaction;
 import com.my.mybatis.type.TypeHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +27,11 @@ public class SimpleExecutor implements Executor {
 
     private Configuration configuration;
 
-    private DataSource dataSource;
+    private Transaction transaction;
 
-    public SimpleExecutor(Configuration configuration) {
+    public SimpleExecutor(Configuration configuration, Transaction transaction) {
         this.configuration = configuration;
-        this.dataSource = configuration.getDataSource();
+        this.transaction = transaction;
     }
 
     @SneakyThrows
@@ -86,6 +87,21 @@ public class SimpleExecutor implements Executor {
         return statementHandler.delete(statement);
     }
 
+    @Override
+    public void commit() {
+        transaction.commit();
+    }
+
+    @Override
+    public void rollback() {
+        transaction.rollback();
+    }
+
+    @Override
+    public void close() {
+        transaction.close();
+    }
+
     /*@SneakyThrows
     private PreparedStatement execute(MappedStatement ms, Object parameter, Connection connection) {
 
@@ -119,6 +135,6 @@ public class SimpleExecutor implements Executor {
         Connection connection = DriverManager.getConnection("jdbc:mysql://root:1234@localhost:3306/my-mybatis");
         return connection;*/
 
-        return dataSource.getConnection();
+        return transaction.getConnection();
     }
 }

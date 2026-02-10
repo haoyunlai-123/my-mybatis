@@ -22,4 +22,11 @@ public interface SqlSession {
     <T> T getMapper(Class<T> mapper);
 
     Configuration getConfiguration();
+
+    void commit();
+
+    void rollback();
+
+    void close();
+
 }

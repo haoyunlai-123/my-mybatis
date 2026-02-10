@@ -90,7 +90,7 @@ public class MapperProxy implements InvocationHandler {
 
     public static void main(String[] args) {
         SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().builder();
-        SqlSession sqlSession = sessionFactory.openSession();
+        SqlSession sqlSession = sessionFactory.openSession(false);
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
 
         /*List<User> zq = userMapper.selectList(1, "zq");

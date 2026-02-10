@@ -34,7 +34,7 @@ public class SqlLogInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) {
         System.out.println("SqlInterceptor intercept start...");
-        PreparedStatement ps = (PreparedStatement) invocation.getArgs()[1];
+        PreparedStatement ps = (PreparedStatement) invocation.getArgs()[0];
         log.info("Executing SQL: {}", ps.toString());
         Object result = invocation.proceed();
         System.out.println("SqlInterceptor intercept end...");

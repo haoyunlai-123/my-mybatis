@@ -17,4 +17,10 @@ public interface Executor {
     int insert(MappedStatement ms, Object parameter);
 
     int delete(MappedStatement ms, Object parameter);
+
+    void commit();
+
+    void rollback();
+
+    void close();
 }

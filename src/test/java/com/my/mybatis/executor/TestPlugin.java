@@ -42,9 +42,14 @@ public class TestPlugin {
     @Test
     public void test2() {
         SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().builder();
-        SqlSession sqlSession = sessionFactory.openSession();
+        SqlSession sqlSession = sessionFactory.openSession(false);
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+
         System.out.println(JSONUtil.toJsonStr(userMapper.selectOne(5)));
+
+        sqlSession.commit();
+
+        sqlSession.close();
     }
 
 }

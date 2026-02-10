@@ -24,7 +24,7 @@ public class PooledDataSource implements DataSource {
     @SneakyThrows
     public PooledDataSource() {
         for (int i = 0; i < POOL_SIZE; i++) {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mybatis?useSSL=false&server");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/my-mybatis?user=root&password=1234");
             pool.add(new PooledConnection(this, connection).getProxy());
         }
     }
@@ -32,7 +32,7 @@ public class PooledDataSource implements DataSource {
     @Override
     public Connection getConnection() throws SQLException {
         return pool.poll() == null ?
-                DriverManager.getConnection("jdbc:mysql://localhost:3306/mybatis?useSSL=false&server")
+                DriverManager.getConnection("jdbc:mysql://localhost:3306/my-mybatis?user=root&password=1234")
                 : (Connection) pool.poll();
     }
 

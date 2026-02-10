@@ -28,4 +28,19 @@ public class BatchExecutor implements Executor {
     public int delete(MappedStatement ms, Object parameter) {
         return 0;
     }
+
+    @Override
+    public void commit() {
+
+    }
+
+    @Override
+    public void rollback() {
+
+    }
+
+    @Override
+    public void close() {
+
+    }
 }

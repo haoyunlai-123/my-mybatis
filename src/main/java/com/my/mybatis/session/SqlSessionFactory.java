@@ -7,4 +7,6 @@ public interface SqlSessionFactory {
 
     SqlSession openSession();
 
+    SqlSession openSession(boolean autoCommit);
+
 }
