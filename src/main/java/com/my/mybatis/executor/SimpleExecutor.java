@@ -13,6 +13,7 @@ import com.my.mybatis.type.TypeHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.sql.DataSource;
 import java.lang.reflect.Parameter;
 import java.sql.*;
 import java.util.*;
@@ -25,14 +26,16 @@ public class SimpleExecutor implements Executor {
 
     private Configuration configuration;
 
+    private DataSource dataSource;
+
     public SimpleExecutor(Configuration configuration) {
         this.configuration = configuration;
+        this.dataSource = configuration.getDataSource();
     }
 
     @SneakyThrows
     @Override
     public <T> List<T> query(MappedStatement ms, Object parameter) {
-
         /*Connection connection = getConnection();
 
         PreparedStatement ps = execute(ms, parameter, connection);*/
@@ -108,12 +111,14 @@ public class SimpleExecutor implements Executor {
     }
 
     @SneakyThrows
-    private static Connection getConnection() {
-        // 加载数据库驱动
+    private Connection getConnection() {
+        /*// 加载数据库驱动
         Class.forName("com.mysql.cj.jdbc.Driver");
 
         // 建立数据库连接
         Connection connection = DriverManager.getConnection("jdbc:mysql://root:1234@localhost:3306/my-mybatis");
-        return connection;
+        return connection;*/
+
+        return dataSource.getConnection();
     }
 }

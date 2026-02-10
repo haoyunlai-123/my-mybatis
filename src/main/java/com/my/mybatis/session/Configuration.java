@@ -2,6 +2,7 @@ package com.my.mybatis.session;
 
 import com.my.mybatis.executor.Executor;
 import com.my.mybatis.executor.SimpleExecutor;
+import com.my.mybatis.executor.datasource.PooledDataSource;
 import com.my.mybatis.executor.parameter.DefaultParameterHandler;
 import com.my.mybatis.executor.parameter.ParameterHandler;
 import com.my.mybatis.executor.resultset.DefaultResultSetHandler;
@@ -17,6 +18,7 @@ import com.my.mybatis.type.StringTypeHandler;
 import com.my.mybatis.type.TypeHandler;
 import lombok.Data;
 
+import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +32,9 @@ public class Configuration {
 
     // 插件链
     private final InterceptorChain interceptorChain = new InterceptorChain();
+
+    // 连接池
+    private final DataSource dataSource = new PooledDataSource();
 
     {
         typeHandlerMap.put(Integer.class, new IntegerTypeHandler());
