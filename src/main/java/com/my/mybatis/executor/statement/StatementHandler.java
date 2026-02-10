@@ -15,4 +15,8 @@ public interface StatementHandler {
     <T> T query(Statement statement);
 
      int update(Statement statement);
+
+     int insert(Statement statement);
+
+     int delete(Statement statement);
 }

@@ -3,6 +3,7 @@ package com.my.mybatis.executor;
 import cn.hutool.core.util.ReflectUtil;
 import com.my.mybatis.annotation.Param;
 import com.my.mybatis.annotation.Select;
+import com.my.mybatis.executor.statement.StatementHandler;
 import com.my.mybatis.mapping.BoundSql;
 import com.my.mybatis.mapping.MappedStatement;
 import com.my.mybatis.parsing.GenericTokenParser;
@@ -32,9 +33,9 @@ public class SimpleExecutor implements Executor {
     @Override
     public <T> List<T> query(MappedStatement ms, Object parameter) {
 
-        Connection connection = getConnection();
+        /*Connection connection = getConnection();
 
-        PreparedStatement ps = execute(ms, parameter, connection);
+        PreparedStatement ps = execute(ms, parameter, connection);*/
 
         // 拿到mapper的返回值类型
         // 这段代码用于获取方法的返回类型：
@@ -48,64 +49,41 @@ public class SimpleExecutor implements Executor {
             returnType = (Class) genericReturnType;
         }*/
 
-        List<T> list = configuration.newResultSetHandler().handleResultSets(ms, ps);
+        /*List<T> list = configuration.newResultSetHandler().handleResultSets(ms, ps);
 
-        connection.close();
+        connection.close();*/
 
-        return list;
+        StatementHandler statementHandler = configuration.newStatementHandler(ms, parameter);
+        Statement statement = prepareStatement(statementHandler);
+        return statementHandler.query(statement);
+
     }
 
     @SneakyThrows
     @Override
     public int update(MappedStatement ms, Object parameter) {
-
-        Connection connection = getConnection();
-
-        PreparedStatement ps = execute(ms, parameter, connection);
-
-        // 拿到操作数
-        int updateCount = ps.getUpdateCount();
-
-        connection.close();
-        ps.close();
-
-        return updateCount;
+        StatementHandler statementHandler = configuration.newStatementHandler(ms, parameter);
+        Statement statement = prepareStatement(statementHandler);
+        return statementHandler.update(statement);
     }
 
     @SneakyThrows
     @Override
     public int insert(MappedStatement ms, Object parameter) {
-        Connection connection = getConnection();
-        // insert into t_user(name, age) values(#{name}, #{age})
-
-        PreparedStatement ps = execute(ms, parameter, connection);
-
-        // 拿到操作数
-        int insertCount = ps.getUpdateCount();
-
-        connection.close();
-        ps.close();
-
-        return insertCount;
+        StatementHandler statementHandler = configuration.newStatementHandler(ms, parameter);
+        Statement statement = prepareStatement(statementHandler);
+        return statementHandler.insert(statement);
     }
 
     @SneakyThrows
     @Override
     public int delete(MappedStatement ms, Object parameter) {
-        Connection connection = getConnection();
-        // delete from t_user where id = #{id}
-        PreparedStatement ps = execute(ms, parameter, connection);
-
-        // 拿到操作数
-        int deleteCount = ps.getUpdateCount();
-
-        connection.close();
-        ps.close();
-
-        return deleteCount;
+        StatementHandler statementHandler = configuration.newStatementHandler(ms, parameter);
+        Statement statement = prepareStatement(statementHandler);
+        return statementHandler.delete(statement);
     }
 
-    @SneakyThrows
+    /*@SneakyThrows
     private PreparedStatement execute(MappedStatement ms, Object parameter, Connection connection) {
 
         BoundSql boundSql = ms.getBoundSql();
@@ -120,6 +98,13 @@ public class SimpleExecutor implements Executor {
         ps.execute();
 
         return ps;
+    }*/
+
+    private Statement prepareStatement(StatementHandler statementHandler) {
+        Connection connection = getConnection();
+        Statement statement = statementHandler.prepare(connection);
+        statementHandler.parameterize(statement);
+        return statement;
     }
 
     @SneakyThrows

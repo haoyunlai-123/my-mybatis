@@ -64,4 +64,20 @@ public class PreparedStatementHandler implements StatementHandler {
         ps.execute();
         return ps.getUpdateCount();
     }
+
+    @SneakyThrows
+    @Override
+    public int insert(Statement statement) {
+        PreparedStatement ps = (PreparedStatement) statement;
+        ps.execute();
+        return ps.getUpdateCount();
+    }
+
+    @SneakyThrows
+    @Override
+    public int delete(Statement statement) {
+        PreparedStatement ps = (PreparedStatement) statement;
+        ps.execute();
+        return ps.getUpdateCount();
+    }
 }
