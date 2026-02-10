@@ -2,7 +2,7 @@ package com.my.mybatis.session;
 
 import com.my.mybatis.executor.Executor;
 import com.my.mybatis.executor.SimpleExecutor;
-import com.my.mybatis.executor.datasource.PooledDataSource;
+import com.my.mybatis.datasource.PooledDataSource;
 import com.my.mybatis.executor.parameter.DefaultParameterHandler;
 import com.my.mybatis.executor.parameter.ParameterHandler;
 import com.my.mybatis.executor.resultset.DefaultResultSetHandler;

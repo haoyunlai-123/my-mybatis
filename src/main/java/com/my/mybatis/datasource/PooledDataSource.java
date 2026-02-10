@@ -1,4 +1,4 @@
-package com.my.mybatis.executor.datasource;
+package com.my.mybatis.datasource;
 
 import lombok.SneakyThrows;
 
