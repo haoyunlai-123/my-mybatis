@@ -2,6 +2,9 @@ package com.my.mybatis;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import com.my.mybatis.scripting.IfSqlNode;
+import com.my.mybatis.scripting.MixedSqlNode;
+import com.my.mybatis.scripting.SqlNode;
 import lombok.SneakyThrows;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -15,6 +18,7 @@ import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestXml {
@@ -41,30 +45,40 @@ public class TestXml {
             String methodName = e.attributeValue("id");
             String resultType = e.attributeValue("resultType");
             System.out.println(methodName + " " + resultType);
-            List<Node> contentList = e.content();
-            for (Node node : contentList) {
-                parseTags(node);
-            }
+            MixedSqlNode mixedSqlNode = parseTags(e);
+            System.out.println(mixedSqlNode);
         }
 
         System.out.println(rootElement.getName());
     }
 
-    private void parseTags(Node node) {
-        if (node.getNodeType() == Node.ELEMENT_NODE) {
-            Element childNodeElement = (Element) node;
-            String sqlNodeType = childNodeElement.getName();
-            String test = childNodeElement.attributeValue("test");
-            System.out.println("类型" + sqlNodeType);
-            System.out.println("表达式" + test);
-            List<Node> contentList = childNodeElement.content();
-            contentList.forEach(item -> parseTags(item));
-        } else {
-            String sql = node.getText();
-            if (StrUtil.isNotBlank(sql)) {
-                System.out.println("sql: " + sql.trim());
+    private MixedSqlNode parseTags(Element e) {
+        List<SqlNode> contents = new ArrayList<>();
+
+        List<Node> contentList = e.content();
+        for (Node node : contentList) {
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element childNodeElement = (Element) node;
+                String sqlNodeType = childNodeElement.getName();
+                String test = childNodeElement.attributeValue("test");
+                System.out.println("类型" + sqlNodeType);
+                System.out.println("表达式" + test);
+
+                if (sqlNodeType.equals("if")) {
+                    contents.add(new IfSqlNode(test, parseTags(childNodeElement)));
+                } else if (sqlNodeType.equals("choose")) {
+//                contents.add(new ChooseSqlNode(test, parseTags(childNodeElement)));
+                }
+            } else {
+                String sql = node.getText();
+                if (StrUtil.isNotBlank(sql)) {
+                    System.out.println("sql: " + sql.trim());
+                }
             }
         }
+
+
+        return new MixedSqlNode(contents);
     }
 
 }
