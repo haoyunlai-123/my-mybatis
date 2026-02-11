@@ -120,7 +120,7 @@ public class XMLConfigBuilder {
         });
 
         // 当前项目目录，而不是classpath目录
-        BufferedInputStream inputStream = FileUtil.getInputStream(System.getProperty("user.dir") + "/src/main/resources/mapper/UserMapper.xml");
+        BufferedInputStream inputStream = FileUtil.getInputStream(System.getProperty("user.dir") + "/src/main/resources/UserMapper.xml");
         Document document = saxReader.read(inputStream);
         Element rootElement = document.getRootElement();
         String namespace = rootElement.attributeValue("namespace");

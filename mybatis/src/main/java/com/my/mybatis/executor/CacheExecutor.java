@@ -24,7 +24,7 @@ public class CacheExecutor implements Executor {
         String cacheKey = ms.getCacheKey(parameter);
         Object cacheData = cache.getObject(cacheKey);
 
-        if (cache != null) {
+        if (cacheData != null) {
             return (List<T>) cacheData;
         }
 
