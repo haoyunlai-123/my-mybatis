@@ -11,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class BoundSql {
 
-    private final String sql;
+    private String sql;
 
-    private final List<String> parameterMappings;
+    private List<String> parameterMappings;
 
 }

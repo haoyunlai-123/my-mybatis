@@ -167,7 +167,11 @@ public class XMLConfigBuilder {
                 }
             } else {
                 String sql = node.getText();
-                contents.add(new StaticTextSqlNode(sql));
+                if (sql.contains("${")) {
+                    contents.add(new TextSqlNode(sql));
+                } else {
+                    contents.add(new StaticTextSqlNode(sql));
+                }
             }
         }
 

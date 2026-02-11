@@ -80,4 +80,9 @@ public class PreparedStatementHandler implements StatementHandler {
         ps.execute();
         return ps.getUpdateCount();
     }
+
+    @Override
+    public BoundSql getBoundSql() {
+        return boundSql;
+    }
 }
