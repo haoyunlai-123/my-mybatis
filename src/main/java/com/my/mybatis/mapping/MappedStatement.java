@@ -3,12 +3,15 @@ package com.my.mybatis.mapping;
 import com.my.mybatis.cache.Cache;
 import com.my.mybatis.parsing.GenericTokenParser;
 import com.my.mybatis.parsing.ParameterMappingTokenHandler;
+import com.my.mybatis.scripting.DynamicContext;
+import com.my.mybatis.scripting.SqlNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * mapper配置信息
@@ -31,7 +34,15 @@ public class MappedStatement {
 
     private Cache cache; // 二级缓存
 
-    public BoundSql getBoundSql() {
+    private SqlNode sqlSource; // 动态sql
+
+    public BoundSql getBoundSql(Object parameter) {
+        if (sqlSource != null) {
+            DynamicContext dynamicContext = new DynamicContext((Map<String, Object>) parameter);
+            sqlSource.apply(dynamicContext);
+            sql = dynamicContext.getSql();
+        }
+
         // sql解析： #{}
         ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler();
         GenericTokenParser tokenParser = new GenericTokenParser("#{", "}", handler);

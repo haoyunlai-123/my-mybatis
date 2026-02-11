@@ -31,7 +31,7 @@ public class PreparedStatementHandler implements StatementHandler {
         this.parameter = parameter;
         parameterHandler = configuration.newParameterHandler();
         resultSetHandler = configuration.newResultSetHandler();
-        boundSql = ms.getBoundSql();
+        boundSql = ms.getBoundSql(parameter);
     }
 
     @SneakyThrows

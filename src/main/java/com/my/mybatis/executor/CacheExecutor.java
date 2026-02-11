@@ -23,9 +23,11 @@ public class CacheExecutor implements Executor {
         Cache cache = ms.getCache();
         String cacheKey = ms.getCacheKey(parameter);
         Object cacheData = cache.getObject(cacheKey);
-        if (cacheData != null) {
+
+        if (cache != null) {
             return (List<T>) cacheData;
         }
+
         List<T> list = delegate.query(ms, parameter);
         cache.putObject(cacheKey, list);
         return list;

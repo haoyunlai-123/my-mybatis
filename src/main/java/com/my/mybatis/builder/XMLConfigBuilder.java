@@ -1,18 +1,30 @@
 package com.my.mybatis.builder;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ClassUtil;
 import com.my.mybatis.annotation.*;
 import com.my.mybatis.cache.PerpetualCache;
 import com.my.mybatis.mapping.MappedStatement;
 import com.my.mybatis.mapping.SqlCommandType;
+import com.my.mybatis.scripting.*;
 import com.my.mybatis.session.Configuration;
+import lombok.SneakyThrows;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.io.SAXReader;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * XML配置构建器
@@ -32,9 +44,11 @@ public class XMLConfigBuilder {
         // 解析mapper
         Configuration configuration = new Configuration();
         parseMapper(configuration);
+        parseMapperXml(configuration);
         return configuration;
     }
 
+    @SneakyThrows
     private void parseMapper(Configuration configuration) {
 
         Set<Class<?>> classes = ClassUtil.scanPackage("com.my.demo.mapper");
@@ -43,6 +57,7 @@ public class XMLConfigBuilder {
             boolean isCache = cacheNamespace != null;
             Method[] methods = aClass.getMethods();
             for (Method method : methods) {
+                boolean isExistAnnotation = false;
                 String originalSql = null;
                 SqlCommandType sqlCommandType = null;
                 for (Class<? extends Annotation> annotationClass : sqlAnnotationSet) {
@@ -60,8 +75,13 @@ public class XMLConfigBuilder {
                             originalSql = method.getAnnotation(Insert.class).value();
                             sqlCommandType = SqlCommandType.INSERT;
                         }
+                        isExistAnnotation = true;
                         break;
                     }
+                }
+
+                if (! isExistAnnotation) {
+                    continue;
                 }
 
                 Class returnType = null;
@@ -87,8 +107,71 @@ public class XMLConfigBuilder {
         }
     }
 
-    public static void main(String[] args) {
-        XMLConfigBuilder xmlConfigBuilder = new XMLConfigBuilder();
-        Configuration configuration = xmlConfigBuilder.parse();
+    @SneakyThrows
+    public void parseMapperXml(Configuration configuration) {
+        // 解析xml文件
+        SAXReader saxReader = new SAXReader();
+
+        saxReader.setEntityResolver(new EntityResolver() {
+            @Override
+            public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+                return new InputSource(new ByteArrayInputStream("<?xml version='1.0' encoding='UTF-8'?>".getBytes()));
+            }
+        });
+
+        // 当前项目目录，而不是classpath目录
+        BufferedInputStream inputStream = FileUtil.getInputStream(System.getProperty("user.dir") + "/src/main/resources/mapper/UserMapper.xml");
+        Document document = saxReader.read(inputStream);
+        Element rootElement = document.getRootElement();
+        String namespace = rootElement.attributeValue("namespace");
+        List<Element> list = rootElement.selectNodes("//select");
+        for (Element e : list) {
+            String methodName = e.attributeValue("id");
+            String resultType = e.attributeValue("resultType");
+            System.out.println(methodName + " " + resultType);
+            MixedSqlNode mixedSqlNode = parseTags(e);
+
+            Class<?> resultTypeClass = Class.forName(resultType);
+            // 封装
+            MappedStatement mappedStatement = MappedStatement.builder()
+                    .id(namespace + "." + methodName)
+                    .sql("")
+                    .sqlSource(mixedSqlNode)
+                    .returnType(resultTypeClass)
+                    .sqlCommandType(SqlCommandType.SELECT)
+                    .isSelectMany(false)
+                    .cache(new PerpetualCache(resultTypeClass.getName()))
+                    .build();
+            configuration.addMappedStatement(mappedStatement);
+        }
+
+        System.out.println(rootElement.getName());
+    }
+
+    private MixedSqlNode parseTags(Element e) {
+        List<SqlNode> contents = new ArrayList<>();
+
+        List<Node> contentList = e.content();
+        for (Node node : contentList) {
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element childNodeElement = (Element) node;
+                String sqlNodeType = childNodeElement.getName();
+                String test = childNodeElement.attributeValue("test");
+                System.out.println("类型" + sqlNodeType);
+                System.out.println("表达式" + test);
+
+                if (sqlNodeType.equals("if")) {
+                    contents.add(new IfSqlNode(test, parseTags(childNodeElement)));
+                } else if (sqlNodeType.equals("choose")) {
+//                contents.add(new ChooseSqlNode(test, parseTags(childNodeElement)));
+                }
+            } else {
+                String sql = node.getText();
+                contents.add(new StaticTextSqlNode(sql));
+            }
+        }
+
+
+        return new MixedSqlNode(contents);
     }
 }
