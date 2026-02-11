@@ -7,6 +7,6 @@ import java.util.Map;
  */
 public interface SqlNode {
 
-    void apply(Map context);
+    void apply(DynamicContext context);
 
 }

@@ -21,8 +21,8 @@ public class IfSqlNode implements SqlNode {
 
     @SneakyThrows
     @Override
-    public void apply(Map context) {
-        Boolean value = (Boolean) Ognl.getValue(test, context);
+    public void apply(DynamicContext context) {
+        Boolean value = (Boolean) Ognl.getValue(test, context.getBindings());
         if (value) {
             sqlNode.apply(context);
         }

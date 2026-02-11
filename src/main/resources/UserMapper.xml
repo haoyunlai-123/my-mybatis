@@ -4,9 +4,13 @@
 
 <mapper namespace="com.my.demo.mapper.UserMapper">
     <select id="findOne" resultType="com.my.demo.entity.User">
-        select * from t_user where id = #{id}
+        select * from t_user
         <if test="id != null">
-            and id = #{id}
+            where id = #{id}
+            <if test="xx != null">
+                limit 1
+            </if>
+
         </if>
     </select>
 </mapper>

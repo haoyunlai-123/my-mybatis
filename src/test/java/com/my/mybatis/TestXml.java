@@ -2,9 +2,7 @@ package com.my.mybatis;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
-import com.my.mybatis.scripting.IfSqlNode;
-import com.my.mybatis.scripting.MixedSqlNode;
-import com.my.mybatis.scripting.SqlNode;
+import com.my.mybatis.scripting.*;
 import lombok.SneakyThrows;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -19,6 +17,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class TestXml {
@@ -46,6 +45,14 @@ public class TestXml {
             String resultType = e.attributeValue("resultType");
             System.out.println(methodName + " " + resultType);
             MixedSqlNode mixedSqlNode = parseTags(e);
+            DynamicContext dynamicContext = new DynamicContext(
+                    new HashMap<String, Object>() {{
+                        this.put("id", 1);
+                        this.put("xx", 2);
+            }}
+            );
+            mixedSqlNode.apply(dynamicContext);
+            dynamicContext.getSql();
             System.out.println(mixedSqlNode);
         }
 
@@ -71,9 +78,7 @@ public class TestXml {
                 }
             } else {
                 String sql = node.getText();
-                if (StrUtil.isNotBlank(sql)) {
-                    System.out.println("sql: " + sql.trim());
-                }
+                contents.add(new StaticTextSqlNode(sql));
             }
         }
 
