@@ -9,6 +9,8 @@ import java.util.List;
 @CacheNamespace
 public interface UserMapper {
 
+    User findOne(Integer id);
+
     @Select("select * from t_user")
     List<User> selectList();
 
