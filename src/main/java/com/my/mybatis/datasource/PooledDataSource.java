@@ -37,7 +37,11 @@ public class PooledDataSource implements DataSource {
     }
 
     public void returnConnection(Connection connection) {
-        pool.add(connection);
+        try {
+            pool.add(connection);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
